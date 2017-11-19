@@ -63,8 +63,13 @@ func main() {
 			}
 			continue
 		}
-		if len(word) >= 2 && word[0:2] == "Fz" {
-			q := strings.TrimSpace(word[3:len(word)])
+		if len(word) >= 6 && word[0:6] == "Search" {
+			q := strings.TrimSpace(word[7:len(word)])
+			doSearch(q)
+			continue
+		}
+		if len(word) >= 5 && word[0:5] == "Fuzzy" {
+			q := strings.TrimSpace(word[6:len(word)])
 			doFuzzySearch(q)
 			continue
 		}
@@ -81,7 +86,7 @@ func initWindow() error {
 
 	title := root + "/" + "-afz"
 	w.Name(title)
-	tag := "Reset Fz"
+	tag := "Reset Search Fuzzy"
 	w.Write("tag", []byte(tag))
 
 	err = printCmdResult()
@@ -133,6 +138,23 @@ func doReset() error {
 	return nil
 }
 
+func doSearch(q string) {
+	if debug {
+		fmt.Fprintf(os.Stderr, "Search: %s\n", q)
+		fmt.Fprintf(os.Stderr, "%v\n", outLines)
+	}
+	res := make([]string, 0)
+	for _, l := range outLines {
+        if strings.Contains(l, q) {
+            res = append(res, l)
+        }
+    }
+	clear()
+	for _, l := range res {
+		w.Write("body", []byte(l + "\n"))
+	}
+}
+
 func doFuzzySearch(q string) {
 	if debug {
 		fmt.Fprintf(os.Stderr, "Search: %s\n", q)
@@ -180,7 +202,9 @@ func events() <-chan string {
 					w.Ctl("delete")
 				case estr == "Reset":
 					c <- "Reset"
-				case (len(estr) >= 2 && estr[0:2] == "Fz"):
+				case (len(estr) >= 6 && estr[0:6] == "Search"):
+					c <- string(e.Text)
+				case (len(estr) >= 5 && estr[0:5] == "Fuzzy"):
 					c <- string(e.Text)
 				default:
 					w.WriteEvent(e)
