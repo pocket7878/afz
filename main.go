@@ -65,12 +65,18 @@ func main() {
 		}
 		if len(word) >= 6 && word[0:6] == "Search" {
 			q := strings.TrimSpace(word[7:len(word)])
-			doSearch(q)
+			if err = doSearch(q); err != nil {
+				fmt.Fprintf(os.Stderr, err.Error())
+				return
+			}
 			continue
 		}
 		if len(word) >= 5 && word[0:5] == "Fuzzy" {
 			q := strings.TrimSpace(word[6:len(word)])
-			doFuzzySearch(q)
+			if err = doFuzzySearch(q); err != nil {
+				fmt.Fprintf(os.Stderr, err.Error())
+				return
+			}
 			continue
 		}
 		onLook(word)
@@ -135,10 +141,14 @@ func doReset() error {
 	if err != nil {
 		return err
 	}
+	err = w.Ctl("clean")
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func doSearch(q string) {
+func doSearch(q string) error {
 	if debug {
 		fmt.Fprintf(os.Stderr, "Search: %s\n", q)
 		fmt.Fprintf(os.Stderr, "%v\n", outLines)
@@ -153,9 +163,14 @@ func doSearch(q string) {
 	for _, l := range res {
 		w.Write("body", []byte(l + "\n"))
 	}
+	err := w.Ctl("clean")
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func doFuzzySearch(q string) {
+func doFuzzySearch(q string) error {
 	if debug {
 		fmt.Fprintf(os.Stderr, "Search: %s\n", q)
 		fmt.Fprintf(os.Stderr, "%v\n", outLines)
@@ -168,6 +183,11 @@ func doFuzzySearch(q string) {
 	for _, l := range res {
 		w.Write("body", []byte(l.Target + "\n"))
 	}
+	err := w.Ctl("clean")
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func onLook(word string) {
