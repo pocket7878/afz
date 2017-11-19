@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sort"
 
 	"github.com/renstrom/fuzzysearch/fuzzy"
 
@@ -137,10 +138,13 @@ func doFuzzySearch(q string) {
 		fmt.Fprintf(os.Stderr, "Search: %s\n", q)
 		fmt.Fprintf(os.Stderr, "%v\n", outLines)
 	}
-	res := fuzzy.Find(q, outLines)
+	res := fuzzy.RankFind(q, outLines)
+	sort.SliceStable(res, func(i, j int) bool {
+		return res[i].Distance < res[j].Distance
+	})
 	clear()
 	for _, l := range res {
-		w.Write("body", []byte(l + "\n"))
+		w.Write("body", []byte(l.Target + "\n"))
 	}
 }
 
