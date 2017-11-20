@@ -7,9 +7,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"sort"
 
-	"github.com/renstrom/fuzzysearch/fuzzy"
+	"github.com/sahilm/fuzzy"
 
 	"9fans.net/go/acme"
 	"9fans.net/go/plan9"
@@ -155,13 +154,13 @@ func doSearch(q string) error {
 	}
 	res := make([]string, 0)
 	for _, l := range outLines {
-        if strings.Contains(l, q) {
-            res = append(res, l)
-        }
-    }
+		if strings.Contains(l, q) {
+			res = append(res, l)
+		}
+	}
 	clear()
 	for _, l := range res {
-		w.Write("body", []byte(l + "\n"))
+		w.Write("body", []byte(l+"\n"))
 	}
 	err := w.Ctl("clean")
 	if err != nil {
@@ -175,13 +174,10 @@ func doFuzzySearch(q string) error {
 		fmt.Fprintf(os.Stderr, "Search: %s\n", q)
 		fmt.Fprintf(os.Stderr, "%v\n", outLines)
 	}
-	res := fuzzy.RankFind(q, outLines)
-	sort.SliceStable(res, func(i, j int) bool {
-		return res[i].Distance < res[j].Distance
-	})
+	matches := fuzzy.Find(q, outLines)
 	clear()
-	for _, l := range res {
-		w.Write("body", []byte(l.Target + "\n"))
+	for _, match := range matches {
+		w.Write("body", []byte(match.Str+"\n"))
 	}
 	err := w.Ctl("clean")
 	if err != nil {

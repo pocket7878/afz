@@ -8,14 +8,14 @@
   revision = "f3da003977a315afefd8b0085cc48356fd2308a3"
 
 [[projects]]
-  name = "github.com/renstrom/fuzzysearch"
-  packages = ["fuzzy"]
-  revision = "d4ca9dfccd55dc6b076f9880d49c35315922c1f4"
-  version = "v1.0.0"
+  name = "github.com/sahilm/fuzzy"
+  packages = ["."]
+  revision = "0e1c4a4e1f632f936a5c0fa6176076eea01c054b"
+  version = "v0.0.3"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a7f437e5f7924266ef143e5fe960b87649467d9cf4ba64d98ac6889632c9bbd1"
+  inputs-digest = "d1323f0403c22a729800c306b78465207029aba99f4594ab2874b6be0a391052"
   solver-name = "gps-cdcl"
   solver-version = 1
