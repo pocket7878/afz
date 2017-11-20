@@ -206,6 +206,7 @@ func onLook(word string) {
 	}
 	if err := msg.Send(port); err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
+		fmt.Fprintf(os.Stderr, "%v\n", msg)
 	}
 	return
 }
@@ -214,7 +215,7 @@ func events() <-chan string {
 	c := make(chan string, 10)
 	go func() {
 		for e := range w.EventChan() {
-			estr := string(e.Text)
+			estr := strings.TrimSpace(string(e.Text))
 			switch e.C2 {
 			case 'x':
 				switch {
@@ -223,9 +224,9 @@ func events() <-chan string {
 				case estr == "Reset":
 					c <- "Reset"
 				case (len(estr) >= 6 && estr[0:6] == "Search"):
-					c <- string(e.Text)
+					c <- string(estr)
 				case (len(estr) >= 5 && estr[0:5] == "Fuzzy"):
-					c <- string(e.Text)
+					c <- string(estr)
 				default:
 					w.WriteEvent(e)
 				}
