@@ -16,11 +16,11 @@ opens new acme window with commands below:
 
 Replace body with rerun command output.
 
-### Search <word>
+### Search `<word>`
 
-Replace body with lines contains <word>.
+Replace body with lines contains `<word>`.
 
-### Fuzzy <pattern>
+### Fuzzy `<pattern>`
 
-Replace body with fuzzy line search result of <word>.
+Replace body with fuzzy line search result of `<pattern>`.
 
