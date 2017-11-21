@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"sort"
 	"strings"
 
-	"github.com/sahilm/fuzzy"
+	"github.com/junegunn/fzf/src/algo"
+	"github.com/junegunn/fzf/src/util"
 
 	"9fans.net/go/acme"
 	"9fans.net/go/plan9"
@@ -26,6 +28,11 @@ var (
 
 const (
 	debug = false
+)
+
+const (
+	slab16Size int = 100 * 1024 // 200KB * 32 = 12.8MB
+	slab32Size int = 2048       // 8KB * 32 = 256KB
 )
 
 func usage() {
@@ -169,15 +176,31 @@ func doSearch(q string) error {
 	return nil
 }
 
+type Result struct {
+	Line  string
+	Score int
+}
+
 func doFuzzySearch(q string) error {
 	if debug {
 		fmt.Fprintf(os.Stderr, "Search: %s\n", q)
 		fmt.Fprintf(os.Stderr, "%v\n", outLines)
 	}
-	matches := fuzzy.Find(q, outLines)
 	clear()
-	for _, match := range matches {
-		w.Write("body", []byte(match.Str+"\n"))
+	slab := util.MakeSlab(slab16Size, slab32Size)
+	res := make([]Result, 0)
+	for _, l := range outLines {
+		chars := util.ToChars([]byte(l))
+		s, _ := algo.FuzzyMatchV2(false, true, true, &chars, []rune(q), true, slab)
+		if s.Score > 0 {
+			res = append(res, Result{l, s.Score})
+		}
+	}
+	sort.SliceStable(res, func(i, j int) bool {
+		return res[i].Score < res[j].Score
+	})
+	for _, r := range res {
+		w.Write("body", []byte(r.Line+"\n"))
 	}
 	err := w.Ctl("clean")
 	if err != nil {
