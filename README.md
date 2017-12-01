@@ -16,10 +16,6 @@ opens new acme window with commands below:
 
 Replace body with rerun command output.
 
-### Search `<word>`
-
-Replace body with lines contains `<word>`.
-
 ### Fuzzy `<pattern>`
 
 Replace body with fuzzy line search result of `<pattern>`.

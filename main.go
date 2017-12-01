@@ -69,14 +69,6 @@ func main() {
 			}
 			continue
 		}
-		if len(word) >= 6 && word[0:6] == "Search" {
-			q := strings.TrimSpace(word[7:len(word)])
-			if err = doSearch(q); err != nil {
-				fmt.Fprintf(os.Stderr, err.Error())
-				return
-			}
-			continue
-		}
 		if len(word) >= 5 && word[0:5] == "Fuzzy" {
 			q := strings.TrimSpace(word[6:len(word)])
 			if err = doFuzzySearch(q); err != nil {
@@ -154,28 +146,6 @@ func doReset() error {
 	return nil
 }
 
-func doSearch(q string) error {
-	if debug {
-		fmt.Fprintf(os.Stderr, "Search: %s\n", q)
-		fmt.Fprintf(os.Stderr, "%v\n", outLines)
-	}
-	res := make([]string, 0)
-	for _, l := range outLines {
-		if strings.Contains(l, q) {
-			res = append(res, l)
-		}
-	}
-	clear()
-	for _, l := range res {
-		w.Write("body", []byte(l+"\n"))
-	}
-	err := w.Ctl("clean")
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 type Result struct {
 	Line  string
 	Score int
@@ -242,8 +212,6 @@ func events() <-chan string {
 					w.Ctl("delete")
 				case estr == "Reset":
 					c <- "Reset"
-				case (len(estr) >= 6 && estr[0:6] == "Search"):
-					c <- string(estr)
 				case (len(estr) >= 5 && estr[0:5] == "Fuzzy"):
 					c <- string(estr)
 				default:
