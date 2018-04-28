@@ -90,7 +90,7 @@ func initWindow() error {
 
 	title := root + "/" + "-afz"
 	w.Name(title)
-	tag := "Reset Search Fuzzy"
+	tag := "Reset Fuzzy"
 	w.Write("tag", []byte(tag))
 
 	err = printCmdResult()
@@ -153,7 +153,7 @@ type Result struct {
 
 func doFuzzySearch(q string) error {
 	if debug {
-		fmt.Fprintf(os.Stderr, "Search: %s\n", q)
+		fmt.Fprintf(os.Stderr, "Fuzzy search: %s\n", q)
 		fmt.Fprintf(os.Stderr, "%v\n", outLines)
 	}
 	clear()
